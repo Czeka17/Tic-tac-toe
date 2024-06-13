@@ -33,15 +33,42 @@ export function click(
   }
 }
 
-export function checkWinner(player: string, board: string[][]): boolean {
-  for (let i = 0; i < 3; i++) {
-    if (board[i][0] === player && board[i][1] === player && board[i][2] === player) return true;
-    if (board[0][i] === player && board[1][i] === player && board[2][i] === player) return true;
+export function checkWinner(player: string, board: string[][]): number {
+  let points = 0;
+
+  const checkLine = (a: string, b: string, c: string): boolean => {
+    return a === player && b === player && c === player;
+  };
+  for (let row = 0; row < board.length; row++) {
+    for (let col = 0; col <= board[row].length - 3; col++) {
+      if (checkLine(board[row][col], board[row][col + 1], board[row][col + 2])) {
+        points++;
+      }
+    }
   }
-  if (board[0][0] === player && board[1][1] === player && board[2][2] === player) return true;
-  if (board[0][2] === player && board[1][1] === player && board[2][0] === player) return true;
-  return false;
+
+  for (let col = 0; col < board[0].length; col++) {
+    for (let row = 0; row <= board.length - 3; row++) {
+      if (checkLine(board[row][col], board[row + 1][col], board[row + 2][col])) {
+        points++;
+      }
+    }
+  }
+
+  for (let row = 0; row <= board.length - 3; row++) {
+    for (let col = 0; col <= board[row].length - 3; col++) {
+      if (checkLine(board[row][col], board[row + 1][col + 1], board[row + 2][col + 2])) {
+        points++;
+      }
+      if (checkLine(board[row][col + 2], board[row + 1][col + 1], board[row + 2][col])) {
+        points++;
+      }
+    }
+  }
+
+  return points;
 }
+
 
 export function isBoardFull(board: string[][]): boolean {
   for (let row of board) {
@@ -53,13 +80,28 @@ export function isBoardFull(board: string[][]): boolean {
   }
   return true;
 }
+export function expandBoard(oldBoard: string[][]): string[][] {
+  const oldSize = oldBoard.length;
+  const newSize = oldSize + 2;
+  const newBoard = Array(newSize).fill('').map(() => Array(newSize).fill(''));
+
+  for (let i = 0; i < oldSize; i++) {
+    for (let j = 0; j < oldSize; j++) {
+      newBoard[i + 1][j + 1] = oldBoard[i][j];
+    }
+  }
+
+  console.log('expand!');
+  return newBoard;
+}
+
 
 export function makeBestMove(board: string[][]): Move | null {
   let bestMove: Move | null = null;
   let bestScore = -Infinity;
 
-  for (let i = 0; i < 3; i++) {
-    for (let j = 0; j < 3; j++) {
+  for (let i = 0; i < board.length; i++) {
+    for (let j = 0; j < board[i].length; j++) {
       if (board[i][j] === EMPTY) {
         board[i][j] = BOT;
         let score = minimax(board, 0, false);
@@ -86,8 +128,8 @@ function minimax(board: string[][], depth: number, isMaximizing: boolean): numbe
 
   if (isMaximizing) {
     let bestScore = -Infinity;
-    for (let i = 0; i < 3; i++) {
-      for (let j = 0; j < 3; j++) {
+    for (let i = 0; i < board.length; i++) {
+      for (let j = 0; j < board[i].length; j++) {
         if (board[i][j] === EMPTY) {
           board[i][j] = BOT;
           bestScore = Math.max(bestScore, minimax(board, depth + 1, false));
@@ -98,8 +140,8 @@ function minimax(board: string[][], depth: number, isMaximizing: boolean): numbe
     return bestScore;
   } else {
     let bestScore = Infinity;
-    for (let i = 0; i < 3; i++) {
-      for (let j = 0; j < 3; j++) {
+    for (let i = 0; i < board.length; i++) {
+      for (let j = 0; j < board[i].length; j++) {
         if (board[i][j] === EMPTY) {
           board[i][j] = PLAYER;
           bestScore = Math.min(bestScore, minimax(board, depth + 1, true));
@@ -113,8 +155,8 @@ function minimax(board: string[][], depth: number, isMaximizing: boolean): numbe
 
 export function makeEasyMove(board: string[][]): Move | null {
   const emptyCells: Move[] = [];
-  for (let i = 0; i < 3; i++) {
-    for (let j = 0; j < 3; j++) {
+  for (let i = 0; i < board.length; i++) {
+    for (let j = 0; j < board[i].length; j++) {
       if (board[i][j] === EMPTY) {
         emptyCells.push({ row: i, col: j });
       }
@@ -130,8 +172,8 @@ export function makeEasyMove(board: string[][]): Move | null {
 
 export function makeMediumMove(board: string[][], player: string): Move | null {
   const opponent = (player === BOT) ? PLAYER : BOT;
-  for (let i = 0; i < 3; i++) {
-    for (let j = 0; j < 3; j++) {
+  for (let i = 0; i < board.length; i++) {
+    for (let j = 0; j < board[i].length; j++) {
       if (board[i][j] === EMPTY) {
         board[i][j] = player;
         if (checkWinner(player, board)) {
@@ -142,8 +184,8 @@ export function makeMediumMove(board: string[][], player: string): Move | null {
       }
     }
   }
-  for (let i = 0; i < 3; i++) {
-    for (let j = 0; j < 3; j++) {
+  for (let i = 0; i < board.length; i++) {
+    for (let j = 0; j < board[i].length; j++) {
       if (board[i][j] === EMPTY) {
         board[i][j] = opponent;
         if (checkWinner(opponent, board)) {

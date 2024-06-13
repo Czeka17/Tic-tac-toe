@@ -7,8 +7,12 @@ interface CellProps {
 
 const Cell: React.FC<CellProps> = ({ value, onClick }) => {
   return (
-    <div className="cell" style={{ backgroundColor: 'white', width: '100px', height: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '10px', borderRadius: '10px', fontSize: '2rem' }} onClick={onClick}>
-      {value}
+    <div className={`${value ? '' : 'clickable'}`} style={{ width: '100px', height: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '10px', borderRadius: '10px', fontSize: '2rem',border:'1px solid white' }} onClick={onClick}>
+        <div className={`cell ${value ? 'appear' : ''}`}
+        >
+            {value}
+        </div>
+      
     </div>
   );
 }

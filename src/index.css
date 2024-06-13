@@ -6,6 +6,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
+  background-color: darkblue;
+  color: white;
 }
 
 code {
@@ -18,8 +20,28 @@ code {
   border-radius: 10px;
   color: white;
   border: 1px solid white;
-  background-color: black;
+  background-color: transparent;
+  transition: 0.3s all;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+.btn:hover{
+  transform: scale(1.05);
 }
 .active{
-  background: red;
+  background: purple;
+  transform: scale(1.05);
+}
+.cell {
+  transition: transform 0.3s, opacity 0.3s;
+  opacity: 0;
+  transform: scale(0.5);
+}
+
+.cell.appear {
+  opacity: 1;
+  transform: scale(1);
+}
+.clickable{
+  cursor: pointer;
 }
